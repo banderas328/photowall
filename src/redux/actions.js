@@ -1,4 +1,85 @@
-//remove
+import {database} from '../databse/config'
+
+export function startAddingPost(post){
+return (dispath)=> {
+    return database.ref('posts').update({[post.id] : post}).then(()=>{
+
+        dispath(addPost(post))
+    }).catch((error) => {
+
+        console.log(error)
+    })
+}
+
+}
+
+export function startLoadingPost(){
+
+    return (dispatch) => {
+
+        return database.ref('posts').once('value').then((snapshot) =>{
+            let posts = []
+            snapshot.forEach((childSnapshot) => {
+                posts.push(childSnapshot.val())
+            })
+            dispatch(loadPosts(posts))
+        }).catch((error) => {
+
+            console.log(error)
+        })
+    }
+}
+
+export function startAddingComment(comment, postId){
+
+    return (dispatch) => {
+
+        return database.ref('comments/'+postId).push(comment).then(()=> {
+
+            dispatch(addComment(comment,postId))
+        }).catch((error) => {
+
+            console.log(error)
+        })
+    }
+}
+export function startLoadingComments(){
+    return (dispatch) => {
+        return database.ref('comments').once('value').then((snapshot) => {
+            let comments = {}
+            snapshot.forEach((childSnapshot) => {
+                comments[childSnapshot.key] = Object.values(childSnapshot.val())
+
+            })
+            dispatch(loadComments(comments))
+
+
+        })
+    }
+}
+export function loadComments(comments) {
+
+    return {
+        type: 'LOAD_COMMENTS',
+        comments
+    }
+}
+
+export function startRemovingPost(index, id) {
+
+    const updates = {
+        [`posts/${id}`]: null,
+        [`comments/${id}`]: null
+    }
+
+    return (dispatch) => {
+        return database.ref().update(updates).then(() => {
+            dispatch(removePost(index))
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+}
 
 export function removePost(index) {
     return {
@@ -7,7 +88,6 @@ export function removePost(index) {
     }
 }
 
-//adding post
 export function addPost(post) {
     return {
         type: 'ADD_POST',
@@ -20,4 +100,12 @@ export function addComment(comment , postId) {
         comment,
         postId
     }
+}
+export function loadPosts(posts){
+    return {
+        type: 'LOAD_POSTS',
+        posts
+    }
+
+
 }
