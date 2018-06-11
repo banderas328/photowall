@@ -1,3 +1,4 @@
+//feel free to send me any images into database i will comment it :)
 import * as firebase from 'firebase'
 var config = {
     apiKey: "AIzaSyAGyqK8NKbYSNPArVtzLxhAxxO4i8R_WwY",
